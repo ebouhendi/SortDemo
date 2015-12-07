@@ -34,6 +34,26 @@ namespace SortDemo
                 swaping1 = idx1;
                 swaping2 = idx2;
             }
+
+            public void RenderBars(Graphics gr, int width)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (i == swaping1)
+                    {
+                        gr.FillRectangle(Brushes.Yellow, 0, i * 6, array[i] * (width / array.Length), 4);
+                        continue;
+                    }
+
+                    if (i == swaping2)
+                    {
+                        gr.FillRectangle(Brushes.YellowGreen, 0, i * 6, array[i] * (width / array.Length), 4);
+                        continue;
+                    }
+
+                    gr.FillRectangle(Brushes.OrangeRed, 0, i * 6, array[i] * (width / array.Length), 4);
+                }
+            }
         }
         public DemoForm()
         {
@@ -54,39 +74,14 @@ namespace SortDemo
                 array[0] = array[next];
                 array[next] = temp;
             }
-
-            
             quick_array = (int[])array.Clone();
-
         }
 
         private void insertionSortPanel_Paint(object sender, PaintEventArgs e)
         {
-            RenderBars(e.Graphics, insertion_array, insertionSortPanel.Width);
-        }
-
-        private static void RenderBars(Graphics gr, ArrayRepresenter representer, int width)
-        {
-            if(representer == null)
+            if(insertion_array != null)
             {
-                return;
-            }
-
-            for (int i = 0; i < representer.array.Length; i++)
-            {
-                if(i == representer.swaping1)
-                {
-                    gr.FillRectangle(Brushes.Yellow, 0, i * 6, representer.array[i] * (width / representer.array.Length), 4);
-                    continue;
-                }
-
-                if (i == representer.swaping2)
-                {
-                    gr.FillRectangle(Brushes.YellowGreen, 0, i * 6, representer.array[i] * (width / representer.array.Length), 4);
-                    continue;
-                }
-
-                    gr.FillRectangle(Brushes.OrangeRed, 0, i * 6, representer.array[i] * (width / representer.array.Length), 4);
+                insertion_array.RenderBars(e.Graphics, insertionSortPanel.Width);
             }
         }
 
@@ -118,32 +113,34 @@ namespace SortDemo
                     swapped = false;
                     for (int j = 1; j < bubble_array.Length; j++)
                     {
-                        if (bubble_array.array[j] < insertion_array.array[j-1])
+                        if (bubble_array.array[j] < bubble_array.array[j-1])
                         {
-                            bubble_array.swap(j, j-1);
+                            bubble_array.swap(j-1, j);
+                            
                             swapped = true;
                             System.Threading.Thread.Sleep(20);
                         }
-
                     }
                 }
             });
-
 
             while (!t1.IsCompleted || !t2.IsCompleted)
             {
               insertionSortPanel.Refresh();
               bubbleSortPanel.Refresh();
               System.Threading.Thread.Sleep(10);
+              
             }
-            
+//            bubbleSortPanel.Refresh();
         }
-
-        
 
         private void bubbleSortPanel_Paint(object sender, PaintEventArgs e)
         {
-            RenderBars(e.Graphics, bubble_array, bubbleSortPanel.Width);
+            if(bubble_array != null)
+            {
+                bubble_array.RenderBars(e.Graphics, bubbleSortPanel.Width);
+            }
+            
         }
     }
 }
