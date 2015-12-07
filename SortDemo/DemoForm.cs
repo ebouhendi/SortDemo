@@ -11,7 +11,7 @@ namespace SortDemo
         private int[] array = new int [ArrayLength];
         private ArrayRepresenter bubble_array;
         private ArrayRepresenter insertion_array;
-        private int[] quick_array;
+        private ArrayRepresenter quick_array;
         
         private class ArrayRepresenter
         {
@@ -37,11 +37,14 @@ namespace SortDemo
                 swaping2 = idx2;
 
                 numberOfSwap++;
+
+                System.Threading.Thread.Sleep(20);
             }
 
             public bool IsLessThan(int idx1, int idx2)
             {
                 numberOfCompare++;
+                System.Threading.Thread.Sleep(4);
                 return array[idx1] < array[idx2];
             }
 
@@ -64,6 +67,11 @@ namespace SortDemo
                     gr.FillRectangle(Brushes.OrangeRed, 0, i * 6, array[i] * (width / array.Length), 4);
                 }
             }
+
+            internal int ItemAt(int idx)
+            {
+                return array[idx];
+            }
         }
         public DemoForm()
         {
@@ -83,9 +91,17 @@ namespace SortDemo
                 array[0] = array[next];
                 array[next] = temp;
             }
-            quick_array = (int[])array.Clone();
+            
         }
 
+        private void bubbleSortPanel_Paint(object sender, PaintEventArgs e)
+        {
+            if (bubble_array != null)
+            {
+                bubble_array.RenderBars(e.Graphics, bubbleSortPanel.Width);
+            }
+
+        }
         private void insertionSortPanel_Paint(object sender, PaintEventArgs e)
         {
             if(insertion_array != null)
@@ -94,10 +110,20 @@ namespace SortDemo
             }
         }
 
+
+        private void quickSortPanel_Paint(object sender, PaintEventArgs e)
+        {
+            if (quick_array != null)
+            {
+                quick_array.RenderBars(e.Graphics, quickSortPanel.Width);
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             insertion_array = new ArrayRepresenter((int[])array.Clone());
             bubble_array = new ArrayRepresenter((int[])array.Clone());
+            quick_array = new ArrayRepresenter((int[])array.Clone());
 
             var t1 = Task.Run(() =>
             {
@@ -108,9 +134,7 @@ namespace SortDemo
                        if (insertion_array.IsLessThan(j, i))
                        {
                            insertion_array.swap(i, j);
-                           System.Threading.Thread.Sleep(20);
                         }
-                       
                    }
                }
             });
@@ -127,30 +151,55 @@ namespace SortDemo
                         {
                             bubble_array.swap(j-1, j);
                             swapped = true;
-                            System.Threading.Thread.Sleep(20);
                         }
                     }
                 }
             });
 
+            var t3 = Task.Run(() =>
+            {
+                PerformQuickSort(quick_array, 0, quick_array.Length - 1);
+            });
+
 
             while (!t1.IsCompleted || !t2.IsCompleted)
             {
-              insertionSortPanel.Refresh();
-              bubbleSortPanel.Refresh();
-              System.Threading.Thread.Sleep(10);
-              
+                insertionSortPanel.Refresh();
+                bubbleSortPanel.Refresh();
+                quickSortPanel.Refresh();
+                System.Threading.Thread.Sleep(10);
             }
 
         }
 
-        private void bubbleSortPanel_Paint(object sender, PaintEventArgs e)
+        private void PerformQuickSort(ArrayRepresenter quick_array, int low, int high)
         {
-            if(bubble_array != null)
+            if(low < high)
             {
-                bubble_array.RenderBars(e.Graphics, bubbleSortPanel.Width);
+                var p = Partition(quick_array, low, high);
+                PerformQuickSort(quick_array, low, p - 1);
+                PerformQuickSort(quick_array, p + 1, high);
             }
-            
         }
+
+        private int Partition(ArrayRepresenter quick_array, int low, int high)
+        {
+            //var pivot = quick_array.ItemAt(high);
+            var pivotIndex = high;
+            var i = low;
+
+            for(int j = low; j < high; j++)
+            {
+                if(quick_array.IsLessThan(j, pivotIndex))
+                {
+                    quick_array.swap(i, j);
+                    i++;
+                }
+            }
+
+            quick_array.swap(i, high);
+            return i;
+        }
+
     }
 }
