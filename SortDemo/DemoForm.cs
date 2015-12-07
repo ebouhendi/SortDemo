@@ -12,12 +12,14 @@ namespace SortDemo
         private ArrayRepresenter bubble_array;
         private ArrayRepresenter insertion_array;
         private int[] quick_array;
-
+        
         private class ArrayRepresenter
         {
-            public readonly int[] array;
-            public int swaping1;
-            public int swaping2;
+            private readonly int[] array;
+            private int swaping1;
+            private int swaping2;
+            public int numberOfSwap = 0;
+            public int numberOfCompare = 0;
             public int Length { get { return array.Length; } }
 
             public ArrayRepresenter(int[] array)
@@ -25,7 +27,7 @@ namespace SortDemo
                 this.array = array;
             }
 
-            public void swap( int idx1,  int idx2)
+            public void swap(int idx1, int idx2)
             {
                 var temp = array[idx1];
                 array[idx1] = array[idx2];
@@ -33,6 +35,14 @@ namespace SortDemo
 
                 swaping1 = idx1;
                 swaping2 = idx2;
+
+                numberOfSwap++;
+            }
+
+            public bool IsLessThan(int idx1, int idx2)
+            {
+                numberOfCompare++;
+                return array[idx1] < array[idx2];
             }
 
             public void RenderBars(Graphics gr, int width)
@@ -58,7 +68,6 @@ namespace SortDemo
         public DemoForm()
         {
             InitializeComponent();
-
             
             for (int i = 0; i< array.Length; i++)
             {
@@ -89,15 +98,16 @@ namespace SortDemo
         {
             insertion_array = new ArrayRepresenter((int[])array.Clone());
             bubble_array = new ArrayRepresenter((int[])array.Clone());
+
             var t1 = Task.Run(() =>
             {
                 for (int i = 0; i < insertion_array.Length; i++)
                 {
                    for (int j = i; j < insertion_array.Length; j++)
                    {
-                       if (insertion_array.array[i] > insertion_array.array[j])
+                       if (insertion_array.IsLessThan(j, i))
                        {
-                            insertion_array.swap(i, j);
+                           insertion_array.swap(i, j);
                            System.Threading.Thread.Sleep(20);
                         }
                        
@@ -113,16 +123,16 @@ namespace SortDemo
                     swapped = false;
                     for (int j = 1; j < bubble_array.Length; j++)
                     {
-                        if (bubble_array.array[j] < bubble_array.array[j-1])
+                        if (bubble_array.IsLessThan(j, j-1))
                         {
                             bubble_array.swap(j-1, j);
-                            
                             swapped = true;
                             System.Threading.Thread.Sleep(20);
                         }
                     }
                 }
             });
+
 
             while (!t1.IsCompleted || !t2.IsCompleted)
             {
@@ -131,7 +141,7 @@ namespace SortDemo
               System.Threading.Thread.Sleep(10);
               
             }
-//            bubbleSortPanel.Refresh();
+
         }
 
         private void bubbleSortPanel_Paint(object sender, PaintEventArgs e)
