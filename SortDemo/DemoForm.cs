@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SortDemo.Util;
+using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -7,83 +8,23 @@ namespace SortDemo
 {
     public partial class DemoForm : Form
     {
-        private const int ArrayLength = 50;
+        private const int ArrayLength = 25;
         private int[] array = new int [ArrayLength];
         private ArrayRepresenter bubble_array;
         private ArrayRepresenter insertion_array;
         private ArrayRepresenter quick_array;
         
-        private class ArrayRepresenter
-        {
-            private readonly int[] array;
-            private int swaping1;
-            private int swaping2;
-            public int numberOfSwap = 0;
-            public int numberOfCompare = 0;
-            public int Length { get { return array.Length; } }
-
-            public ArrayRepresenter(int[] array)
-            {
-                this.array = array;
-            }
-
-            public void swap(int idx1, int idx2)
-            {
-                var temp = array[idx1];
-                array[idx1] = array[idx2];
-                array[idx2] = temp;
-
-                swaping1 = idx1;
-                swaping2 = idx2;
-
-                numberOfSwap++;
-
-                System.Threading.Thread.Sleep(20);
-            }
-
-            public bool IsLessThan(int idx1, int idx2)
-            {
-                numberOfCompare++;
-                System.Threading.Thread.Sleep(4);
-                return array[idx1] < array[idx2];
-            }
-
-            public void RenderBars(Graphics gr, int width)
-            {
-                for (int i = 0; i < array.Length; i++)
-                {
-                    if (i == swaping1)
-                    {
-                        gr.FillRectangle(Brushes.Yellow, 0, i * 6, array[i] * (width / array.Length), 4);
-                        continue;
-                    }
-
-                    if (i == swaping2)
-                    {
-                        gr.FillRectangle(Brushes.YellowGreen, 0, i * 6, array[i] * (width / array.Length), 4);
-                        continue;
-                    }
-
-                    gr.FillRectangle(Brushes.OrangeRed, 0, i * 6, array[i] * (width / array.Length), 4);
-                }
-            }
-
-            internal int ItemAt(int idx)
-            {
-                return array[idx];
-            }
-        }
+       
         public DemoForm()
         {
             InitializeComponent();
-            
-            for (int i = 0; i< array.Length; i++)
-            {
-                array[i] = i+1;
-            }
+            CreateSortedArray();
+            //RanodomizeArray();
+        }
 
+        private void RanodomizeArray()
+        {
             var random = new Random();
-
             for (int i = 0; i < array.Length * 4; i++)
             {
                 var next = random.Next(0, array.Length);
@@ -91,14 +32,21 @@ namespace SortDemo
                 array[0] = array[next];
                 array[next] = temp;
             }
-            
+        }
+
+        private void CreateSortedArray()
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = i + 1;
+            }
         }
 
         private void bubbleSortPanel_Paint(object sender, PaintEventArgs e)
         {
             if (bubble_array != null)
             {
-                bubble_array.RenderBars(e.Graphics, bubbleSortPanel.Width);
+                bubble_array.RenderBars(e.Graphics, e.ClipRectangle);
             }
 
         }
@@ -106,7 +54,7 @@ namespace SortDemo
         {
             if(insertion_array != null)
             {
-                insertion_array.RenderBars(e.Graphics, insertionSortPanel.Width);
+                insertion_array.RenderBars(e.Graphics, e.ClipRectangle);
             }
         }
 
@@ -115,7 +63,7 @@ namespace SortDemo
         {
             if (quick_array != null)
             {
-                quick_array.RenderBars(e.Graphics, quickSortPanel.Width);
+                quick_array.RenderBars(e.Graphics, e.ClipRectangle);
             }
         }
 
@@ -162,7 +110,7 @@ namespace SortDemo
             });
 
 
-            while (!t1.IsCompleted || !t2.IsCompleted)
+            while (!t1.IsCompleted || !t2.IsCompleted || !t3.IsCompleted)
             {
                 insertionSortPanel.Refresh();
                 bubbleSortPanel.Refresh();
@@ -184,7 +132,6 @@ namespace SortDemo
 
         private int Partition(ArrayRepresenter quick_array, int low, int high)
         {
-            //var pivot = quick_array.ItemAt(high);
             var pivotIndex = high;
             var i = low;
 
