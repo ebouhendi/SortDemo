@@ -9,17 +9,17 @@ namespace SortDemo
     public partial class DemoForm : Form
     {
         private const int ArrayLength = 25;
-        private int[] array = new int [ArrayLength];
+        private int[] array = new int[ArrayLength];
         private ArrayRepresenter bubble_array;
         private ArrayRepresenter insertion_array;
         private ArrayRepresenter quick_array;
-        
-       
+
+
         public DemoForm()
         {
             InitializeComponent();
             CreateSortedArray();
-            //RanodomizeArray();
+            RanodomizeArray();
         }
 
         private void RanodomizeArray()
@@ -44,27 +44,19 @@ namespace SortDemo
 
         private void bubbleSortPanel_Paint(object sender, PaintEventArgs e)
         {
-            if (bubble_array != null)
-            {
-                bubble_array.RenderBars(e.Graphics, e.ClipRectangle);
-            }
+
+            bubble_array?.RenderBars(e.Graphics, e.ClipRectangle);
 
         }
         private void insertionSortPanel_Paint(object sender, PaintEventArgs e)
         {
-            if(insertion_array != null)
-            {
-                insertion_array.RenderBars(e.Graphics, e.ClipRectangle);
-            }
+            insertion_array?.RenderBars(e.Graphics, e.ClipRectangle);
         }
 
 
         private void quickSortPanel_Paint(object sender, PaintEventArgs e)
         {
-            if (quick_array != null)
-            {
-                quick_array.RenderBars(e.Graphics, e.ClipRectangle);
-            }
+            quick_array?.RenderBars(e.Graphics, e.ClipRectangle);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -77,27 +69,27 @@ namespace SortDemo
             {
                 for (int i = 0; i < insertion_array.Length; i++)
                 {
-                   for (int j = i; j < insertion_array.Length; j++)
-                   {
-                       if (insertion_array.IsLessThan(j, i))
-                       {
-                           insertion_array.swap(i, j);
+                    for (int j = i; j < insertion_array.Length; j++)
+                    {
+                        if (insertion_array.IsLessThan(j, i))
+                        {
+                            insertion_array.swap(i, j);
                         }
-                   }
-               }
+                    }
+                }
             });
 
             var t2 = Task.Run(() =>
             {
                 var swapped = true;
-                while(swapped)
+                while (swapped)
                 {
                     swapped = false;
                     for (int j = 1; j < bubble_array.Length; j++)
                     {
-                        if (bubble_array.IsLessThan(j, j-1))
+                        if (bubble_array.IsLessThan(j, j - 1))
                         {
-                            bubble_array.swap(j-1, j);
+                            bubble_array.swap(j - 1, j);
                             swapped = true;
                         }
                     }
@@ -108,7 +100,6 @@ namespace SortDemo
             {
                 PerformQuickSort(quick_array, 0, quick_array.Length - 1);
             });
-
 
             while (!t1.IsCompleted || !t2.IsCompleted || !t3.IsCompleted)
             {
@@ -122,7 +113,7 @@ namespace SortDemo
 
         private void PerformQuickSort(ArrayRepresenter quick_array, int low, int high)
         {
-            if(low < high)
+            if (low < high)
             {
                 var p = Partition(quick_array, low, high);
                 PerformQuickSort(quick_array, low, p - 1);
@@ -135,9 +126,9 @@ namespace SortDemo
             var pivotIndex = high;
             var i = low;
 
-            for(int j = low; j < high; j++)
+            for (int j = low; j < high; j++)
             {
-                if(quick_array.IsLessThan(j, pivotIndex))
+                if (quick_array.IsLessThan(j, pivotIndex))
                 {
                     quick_array.swap(i, j);
                     i++;
