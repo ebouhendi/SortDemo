@@ -1,6 +1,5 @@
 ﻿using SortDemo.Util;
 using System;
-using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,7 +12,6 @@ namespace SortDemo
         private ArrayRepresenter bubble_array;
         private ArrayRepresenter insertion_array;
         private ArrayRepresenter quick_array;
-
 
         public DemoForm()
         {
