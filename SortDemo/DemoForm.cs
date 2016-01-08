@@ -56,15 +56,15 @@ namespace SortDemo
         {
             quick_array?.RenderBars(e.Graphics, e.ClipRectangle);
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        private void RunDemo()
         {
             insertion_array = new ArrayRepresenter((int[])array.Clone());
             bubble_array = new ArrayRepresenter((int[])array.Clone());
             quick_array = new ArrayRepresenter((int[])array.Clone());
-
+            RefreshPanels();
             var t1 = Task.Run(() =>
             {
+
                 for (int i = 0; i < insertion_array.Length; i++)
                 {
                     for (int j = i; j < insertion_array.Length; j++)
@@ -72,6 +72,7 @@ namespace SortDemo
                         if (insertion_array.IsLessThan(j, i))
                         {
                             insertion_array.swap(i, j);
+                            RefreshPanel(insertionSortPanel);
                         }
                     }
                 }
@@ -89,6 +90,7 @@ namespace SortDemo
                         {
                             bubble_array.swap(j - 1, j);
                             swapped = true;
+                            RefreshPanel(bubbleSortPanel);
                         }
                     }
                 }
@@ -98,15 +100,23 @@ namespace SortDemo
             {
                 PerformQuickSort(quick_array, 0, quick_array.Length - 1);
             });
+        }
 
-            while (!t1.IsCompleted || !t2.IsCompleted || !t3.IsCompleted)
+        private void RefreshPanels()
+        {
+            insertionSortPanel.Refresh();
+            bubbleSortPanel.Refresh();
+            quickSortPanel.Refresh();
+        }
+        private void RefreshPanel(Panel panel)
+        {
+            if (InvokeRequired)
             {
-                insertionSortPanel.Refresh();
-                bubbleSortPanel.Refresh();
-                quickSortPanel.Refresh();
-                System.Threading.Thread.Sleep(10);
+                MethodInvoker method = new MethodInvoker(()=> { RefreshPanel(panel); });
+                Invoke(method);
+                return;
             }
-
+            panel.Refresh();
         }
 
         private void PerformQuickSort(ArrayRepresenter quick_array, int low, int high)
@@ -129,13 +139,29 @@ namespace SortDemo
                 if (quick_array.IsLessThan(j, pivotIndex))
                 {
                     quick_array.swap(i, j);
+                    RefreshPanel(quickSortPanel);
                     i++;
                 }
             }
 
             quick_array.swap(i, high);
+            RefreshPanel(quickSortPanel);
             return i;
         }
 
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            RunDemo();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            insertionSortPanel.Refresh();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            RunDemo();
+        }
     }
 }
