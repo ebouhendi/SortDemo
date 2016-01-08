@@ -159,8 +159,11 @@ namespace SortDemo
             insertionSortPanel.Refresh();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+
+        private void runButton_Click(object sender, EventArgs e)
         {
+            pauseButton.Visible = true;
+            runButton.Visible = false;
             RunDemo();
         }
     }
