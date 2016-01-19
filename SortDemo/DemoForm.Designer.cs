@@ -125,6 +125,8 @@
             this.pauseButton.Name = "pauseButton";
             this.pauseButton.Size = new System.Drawing.Size(23, 22);
             this.pauseButton.Text = "Pause";
+            this.pauseButton.Visible = false;
+            this.pauseButton.Click += new System.EventHandler(this.pauseButton_Click);
             // 
             // DemoForm
             // 

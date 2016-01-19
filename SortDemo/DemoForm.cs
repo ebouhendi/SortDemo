@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace SortDemo
 {
@@ -12,12 +13,15 @@ namespace SortDemo
         private ArrayRepresenter bubble_array;
         private ArrayRepresenter insertion_array;
         private ArrayRepresenter quick_array;
+        private bool isPaused = false;
+        private CancellationTokenSource cancellationTokenSource;
 
         public DemoForm()
         {
             InitializeComponent();
             CreateSortedArray();
             RanodomizeArray();
+            ResetArrays();
         }
 
         private void RanodomizeArray()
@@ -58,10 +62,11 @@ namespace SortDemo
         }
         private void RunDemo()
         {
-            insertion_array = new ArrayRepresenter((int[])array.Clone());
-            bubble_array = new ArrayRepresenter((int[])array.Clone());
-            quick_array = new ArrayRepresenter((int[])array.Clone());
+           
+            
             RefreshPanels();
+            cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
             var t1 = Task.Run(() =>
             {
 
@@ -74,9 +79,13 @@ namespace SortDemo
                             insertion_array.swap(i, j);
                             RefreshPanel(insertionSortPanel);
                         }
+                        if (isPaused)
+                        {
+                            return;
+                        }
                     }
                 }
-            });
+            }, cancellationToken);
 
             var t2 = Task.Run(() =>
             {
@@ -92,14 +101,26 @@ namespace SortDemo
                             swapped = true;
                             RefreshPanel(bubbleSortPanel);
                         }
+                        if (isPaused)
+                        {
+                            return;
+                        }
                     }
                 }
-            });
+            }, cancellationToken);
 
             var t3 = Task.Run(() =>
             {
                 PerformQuickSort(quick_array, 0, quick_array.Length - 1);
-            });
+            }, cancellationToken);
+            
+        }
+
+        private void ResetArrays()
+        {
+            insertion_array = new ArrayRepresenter((int[])array.Clone());
+            bubble_array = new ArrayRepresenter((int[])array.Clone());
+            quick_array = new ArrayRepresenter((int[])array.Clone());
         }
 
         private void RefreshPanels()
@@ -121,6 +142,11 @@ namespace SortDemo
 
         private void PerformQuickSort(ArrayRepresenter quick_array, int low, int high)
         {
+            if(isPaused)
+            {
+                return;
+            }
+
             if (low < high)
             {
                 var p = Partition(quick_array, low, high);
@@ -149,11 +175,6 @@ namespace SortDemo
             return i;
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            RunDemo();
-        }
-
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
             insertionSortPanel.Refresh();
@@ -164,7 +185,18 @@ namespace SortDemo
         {
             pauseButton.Visible = true;
             runButton.Visible = false;
+            //isPaused = false;
             RunDemo();
+        }
+
+        private void pauseButton_Click(object sender, EventArgs e)
+        {
+            runButton.Visible = true;
+            pauseButton.Visible = false;
+            cancellationTokenSource.Cancel();
+            //isPaused = true;
+            
+
         }
     }
 }
