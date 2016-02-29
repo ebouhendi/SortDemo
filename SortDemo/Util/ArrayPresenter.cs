@@ -43,20 +43,18 @@ namespace SortDemo.Util
             var barLengthUnit = (area.Width / array.Length);
             for (int i = 0; i < array.Length; i++)
             {
-                
+                var brush = Brushes.OrangeRed;
                 if (i == swaping1)
                 {
-                    DrawBar(gr, barWidth, barLengthUnit, i, Brushes.Yellow);
-                    continue;
+                    brush = Brushes.Yellow;
                 }
 
                 if (i == swaping2)
                 {
-                    DrawBar(gr, barWidth, barLengthUnit, i, Brushes.YellowGreen);
-                    continue;
+                    brush = Brushes.YellowGreen;
                 }
 
-                DrawBar(gr, barWidth, barLengthUnit, i, Brushes.OrangeRed);
+                DrawBar(gr, barWidth, barLengthUnit, i, brush);
             }
         }
 

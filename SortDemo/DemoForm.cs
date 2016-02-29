@@ -15,6 +15,7 @@ namespace SortDemo
         private ArrayRepresenter quick_array;
         private bool isPaused = false;
         private CancellationTokenSource cancellationTokenSource;
+        private Task t1;
 
         public DemoForm()
         {
@@ -54,12 +55,12 @@ namespace SortDemo
         {
             insertion_array?.RenderBars(e.Graphics, e.ClipRectangle);
         }
-
-
+        
         private void quickSortPanel_Paint(object sender, PaintEventArgs e)
         {
             quick_array?.RenderBars(e.Graphics, e.ClipRectangle);
         }
+
         private void RunDemo()
         {
            
@@ -67,7 +68,7 @@ namespace SortDemo
             RefreshPanels();
             cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
-            var t1 = Task.Run(() =>
+            t1 = Task.Run(() =>
             {
 
                 for (int i = 0; i < insertion_array.Length; i++)
@@ -78,10 +79,6 @@ namespace SortDemo
                         {
                             insertion_array.swap(i, j);
                             RefreshPanel(insertionSortPanel);
-                        }
-                        if (isPaused)
-                        {
-                            return;
                         }
                     }
                 }
@@ -185,7 +182,7 @@ namespace SortDemo
         {
             pauseButton.Visible = true;
             runButton.Visible = false;
-            //isPaused = false;
+            isPaused = false;
             RunDemo();
         }
 
@@ -193,10 +190,8 @@ namespace SortDemo
         {
             runButton.Visible = true;
             pauseButton.Visible = false;
-            cancellationTokenSource.Cancel();
-            //isPaused = true;
+            isPaused = true;
             
-
         }
     }
 }
